@@ -1,10 +1,11 @@
 class Player {
 
-  constructor(color) {
-    this.color = color;
-    this.tokenCount = 21;
+  constructor(color, level=0) {
+    this.color = color
+    this.tokenCount = 21
+    this.level = level
   }
 
 }
 
-module.exports = Player;
+module.exports = Player

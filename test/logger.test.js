@@ -1,30 +1,47 @@
 const Logger = require('../logger')
 const {
+  getPaddedGrid
+} = require('../Grid')
+const {
   emptyGrid,
   halfFullGrid,
   fullGrid
 } = require('../grids.mock')
 
 let logger;
+let grids;
 
 beforeAll( () => {
   logger = new Logger();
-})
-
-beforeEach( () => {
-  if(logger.logLine.mockRestore) {
-    logger.logLine.mockRestore()
+  grids = {
+    empty: getPaddedGrid(emptyGrid),
+    halfFull: getPaddedGrid(halfFullGrid),
+    full: getPaddedGrid(fullGrid),
   }
 })
 
-test('log a grid', () => {
-  logger.logLine = jest.fn()
-  logger.logGrid(halfFullGrid, ['red', 'green']);
-  expect(logger.logLine.mock.calls.length).toBe(6)
+afterEach( () => {
+  if(jest.isMockFunction(logger.drawLine)) {
+    //console.log('AV logger.drawLine.mockRestore : ', logger.drawLine);
+    logger.drawLine.mockRestore()
+    //console.log('AP logger.drawLine.mockRestore : ', logger.drawLine);
+  }
 })
 
-test('log all test grid', () => {
-  logger.logGrid(emptyGrid, ['red', 'green']);
-  logger.logGrid(halfFullGrid, ['red', 'green']);
-  logger.logGrid(fullGrid, ['red', 'green']);
+test('logger.drawLine have to be called 6 times', () => {
+  //logger.drawLine = jest.fn()
+  jest.spyOn(logger, 'drawLine')
+  logger.drawGrid(grids.empty, ['red', 'green']);
+  logger.drawGrid(grids.halfFull, ['red', 'green']);
+  logger.drawGrid(grids.full, ['red', 'green']);
+  // console.log('====================================');
+  // console.log('jest.isMockFunction : ', jest.isMockFunction(logger.drawLine));
+  // console.log('====================================');
+  expect(logger.drawLine.mock.calls.length).toBe(18)
 })
+
+// test('log all test grid', () => {
+//   logger.drawGrid(grids.empty, ['red', 'green']);
+//   logger.drawGrid(grids.halfFull, ['red', 'green']);
+//   logger.drawGrid(grids.full, ['red', 'green']);
+// })
