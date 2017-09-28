@@ -11,6 +11,21 @@ IA.chooseColumn = (grid, tokenIndex, level = 0) => {
   return IA[strategies[level]]({ grid, availableCols, tokenIndex});
 }
 
+// IA.chooseColumnIndex = (grid) => {
+//   const availableColIndexes = IA.getAvailableColumnIndexes(grid)
+//   return (availableColIndexes && availableColIndexes.length) ? IA.getRandomValueInArray(availableColIndexes) : -1;
+// }
+
+IA.getAvailableColumns = (grid) => {
+  return grid.map((col, i) => ({ index: i, length: col.length }))
+    .filter(item => item.length < 6)
+    .map(item => ({ index: item.index, length: item.length }))
+}
+
+/**
+ * TODO: TO PUT IN STRATEGIES
+ */
+
 IA.strategyExtra = ({ grid, availableCols, tokenIndex }) => {
 
   const availableColIndexes = availableCols.map(e => e.index)
@@ -59,17 +74,23 @@ IA.strategyZero = ({ availableCols }) => {
   return IA.getRandomValueInArray(availableCols.map(e => e.index))
 }
 
-IA.getBetterSequence = (grid, columnIndexes, tokenIndex) => {
+/**
+ * TODO: TO PUT IN SPOT
+ */
+IA.getOpponentToken = (v) => Number(!v)
 
-  return columnIndexes.map(colIndex => {
-    return {
-      index: colIndex,
-      score: IA.getMaxSeqLength(grid, colIndex, tokenIndex)
-    }
-  }).sort((a, b) => b.score - a.score )[0]
+/**
+ * TODO: TO PUT IN GRID (?)
+ */
+IA.isFullGrid = (grid) => {
+  return grid.every(col => col.length === 6)
 }
 
-// TODO : R.assoc
+/**
+ * TODO: VECTORS
+ */
+
+// TODO : (RAMDA) R.assoc
 IA.addVectorDistances = (cols, [x, y]) => {
   return cols.map( col => 
     Object.assign(col, { vDist: IA.getVectorDistance([col.index, col.length], [x, y]) })
@@ -98,21 +119,10 @@ IA.getShortestYX = (arr) => {
   )[0]
 }
 
-IA.getOpponentToken = (v) => Number(!v)
-
 // TODO : TEST RAMDA minBy to do it
 // IA.getClosest = (arr, value) => arr.reduce((a, acc) => {
 //   Math.min(Math.abs(value - a), Math.abs(value - acc))
 // }, 999)
-
-IA.isFullGrid = (grid) => {
-  return grid.every( col => col.length === 6 )
-}
-
-// IA.chooseColumnIndex = (grid) => {
-//   const availableColIndexes = IA.getAvailableColumnIndexes(grid)
-//   return (availableColIndexes && availableColIndexes.length) ? IA.getRandomValueInArray(availableColIndexes) : -1;
-// }
 
 IA.getRandomValueInArray = (arr) => {
   return arr[IA.getRandom(arr.length)];
@@ -122,11 +132,9 @@ IA.getRandom = (max) => {
   return Math.floor(Math.random() * max);
 }
 
-IA.getAvailableColumns = (grid) => {
-  return  grid.map( (col, i) => ({index: i, length: col.length}) )
-              .filter( item => item.length < 6)
-              .map( item => ({index: item.index, length: item.length}))
-}
+/**
+ * SEQUENCES
+ */
 
 //max x = 6
 //max y = 5
@@ -221,6 +229,16 @@ IA.getMaxSeqLength = (grid, colIndex, v) => {
     IA.getSeqLengthDLR(grid, v, x, y),
     IA.getSeqLengthDRL(grid, v, x, y)
   )
+}
+
+IA.getBetterSequence = (grid, columnIndexes, tokenIndex) => {
+
+  return columnIndexes.map(colIndex => {
+    return {
+      index: colIndex,
+      score: IA.getMaxSeqLength(grid, colIndex, tokenIndex)
+    }
+  }).sort((a, b) => b.score - a.score)[0]
 }
 
 module.exports = IA;
